@@ -1,4 +1,7 @@
-<?php include 'connection.php'; ?>
+<?php
+include 'connection.php';
+spl_autoload_register();
+?>
     <!DOCTYPE html>
     <html lang="en-US">
     <head>
@@ -45,24 +48,13 @@
 <?php
 if (isset($_FILES['photo'])) {
     $photo = $_FILES['photo'];
-    $fileUpload = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
-    $fileSize = $_FILES["photo"]["size"];
-    $allowed_image_extension = ["png", "jpg"];
-    $fileInfo = @getimagesize($_FILES["photo"]["tmp_name"]);
-    if (!in_array($fileUpload, $allowed_image_extension)) {
-        echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Upload images. Only PNG and JPG are allowed.' . '<p/>';
-        exit;
-    }
-    if ($fileSize > 100000) {
-        echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Image size exceeds 1MB' . '<p/>';
-        exit;
+    Classes\Photo::validationPhoto($photo);
+    $target = "image/" . basename($photo["name"]);
+    if (move_uploaded_file($photo["tmp_name"], $target)) {
+        echo '';
     } else {
-        $target = "image/" . basename($_FILES["photo"]["name"]);
-        if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target)) {
-            echo '';
-        } else {
-            echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Problem in uploading image files.' . '<p/>';
-        }
+        echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Problem in uploading image files.' . '<p/>';
+        exit;
     }
     if (isset($_POST['submit'])) {
         $age = $_POST['age'];
@@ -77,26 +69,16 @@ if (isset($_FILES['photo'])) {
             echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . '18+' . '<p/>';
             exit;
         }
+        Classes\Mail::sentMail($age, $email, $surname, $name);
+        $query = "INSERT INTO users (name,surname,email,age,photo) VALUES ('" . $name . "','" . $surname . "','" . $email . "','" . $age . "','" . $target . "')";
+        mysqli_query($db, $query) or die ('Error in updating Database');
 
-        $to = $email = $_POST['email'];
-        $subject = "Office supplies - Reminder";
-        $message = "test\n\nyes";
-        $headers = "From: belousalek2@gmail.com";
-
-
-        if (mail($to, $subject, $message, $headers)) {
-            $query = "INSERT INTO users (name,surname,email,age,photo) VALUES ('" . $name . "','" . $surname . "','" . $email . "','" . $age . "','" . $target . "')";
-            mysqli_query($db, $query) or die ('Error in updating Database');
-
-            ?>
-            <script type="text/javascript">
-                alert("Success full Added.");
-                window.location = "index.php";
-            </script>
-            <?php
-        } else{
-            echo 'no';
-        }
+        ?>
+        <script type="text/javascript">
+            alert("Success full Added.");
+            window.location = "index.php";
+        </script>
+        <?php
     }
 }
 ?>

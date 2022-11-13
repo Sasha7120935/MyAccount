@@ -1,5 +1,6 @@
 <?php
 include 'connection.php';
+spl_autoload_register();
 session_start();
 $id = $_SESSION['id'];
 $query = mysqli_query($db, "SELECT * FROM users where user_id='$id'") or die(mysqli_error());
@@ -76,24 +77,12 @@ $row = mysqli_fetch_array($query);
 if (isset($_POST['submit'])) {
     if (isset($_FILES['photo'])) {
         $photo = $_FILES['photo'];
-        $fileUpload = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
-        $fileSize = $_FILES["photo"]["size"];
-        $allowed_image_extension = ["png", "jpg"];
-        $fileInfo = @getimagesize($_FILES["photo"]["tmp_name"]);
-        if (!in_array($fileUpload, $allowed_image_extension)) {
-            echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Upload images. Only PNG and JPG are allowed.' . '<p/>';
-            exit;
-        }
-        if ($fileSize > 100000) {
-            echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Image size exceeds 1MB' . '<p/>';
-            exit;
+        Classes\Photo::validationPhoto($photo);
+        $target = "image/" . basename($_FILES["photo"]["name"]);
+        if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target)) {
+            echo '';
         } else {
-            $target = "image/" . basename($_FILES["photo"]["name"]);
-            if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target)) {
-                echo '';
-            } else {
-                echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Problem in uploading image files.' . '<p/>';
-            }
+            echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Problem in uploading image files.' . '<p/>';
         }
         $age = $_POST['age'];
         $surname = $_POST['surname'];
