@@ -1,4 +1,7 @@
 <?php
+
+use Imagecow\Image;
+
 spl_autoload_register();
 ?>
     <!DOCTYPE html>
@@ -46,6 +49,7 @@ spl_autoload_register();
     </html>
 <?php
 if (isset($_FILES['photo'])) {
+    if (isset($_POST['submit'])) {
     $photo = $_FILES['photo'];
     Classes\Validation::validationPhoto($photo);
     $target = "image/" . basename($photo["name"]);
@@ -55,8 +59,6 @@ if (isset($_FILES['photo'])) {
         echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Problem in uploading image files.' . '<p/>';
         exit;
     }
-
-    if (isset($_POST['submit'])) {
         Classes\Validation::validationEmail($_POST['email']);
         Classes\Validation::validationAge($_POST['age']);
         Classes\Mail::sentMail($_POST['age'], $_POST['email'], $_POST['surname'], $_POST['user'], $target);

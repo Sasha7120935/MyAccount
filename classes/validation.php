@@ -10,7 +10,7 @@ class Validation
     {
         $fileUpload = pathinfo($photo["name"], PATHINFO_EXTENSION);
         $fileSize = $photo["size"];
-        $allowed_image_extension = ["png", "jpg", "jpeg"];
+        $allowed_image_extension = ["png", "jpg"];
 //        $fileInfo = @getimagesize($photo["tmp_name"]);
 //        $width = $fileInfo[0];
 //        $height = $fileInfo[1];
@@ -27,7 +27,7 @@ class Validation
     public static function validationEmail($email)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo 'Invalid email format';
+            echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Invalid email format' . '<p/>';
             exit;
         }
     }
