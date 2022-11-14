@@ -1,5 +1,4 @@
 <?php
-include 'connection.php';
 spl_autoload_register();
 ?>
     <!DOCTYPE html>
@@ -48,7 +47,7 @@ spl_autoload_register();
 <?php
 if (isset($_FILES['photo'])) {
     $photo = $_FILES['photo'];
-    Classes\Photo::validationPhoto($photo);
+    Classes\Validation::validationPhoto($photo);
     $target = "image/" . basename($photo["name"]);
     if (move_uploaded_file($photo["tmp_name"], $target)) {
         echo '';
@@ -56,22 +55,12 @@ if (isset($_FILES['photo'])) {
         echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . 'Problem in uploading image files.' . '<p/>';
         exit;
     }
+
     if (isset($_POST['submit'])) {
-        $age = $_POST['age'];
-        $surname = $_POST['surname'];
-        $name = $_POST['user'];
-        $email = $_POST['email'];
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo 'Invalid email format';
-            exit;
-        }
-        if ($age < 18) {
-            echo '<p style="text-align: center; color: red; font-size: large; font-weight: bold;">' . '18+' . '<p/>';
-            exit;
-        }
-        Classes\Mail::sentMail($age, $email, $surname, $name);
-        $query = "INSERT INTO users (name,surname,email,age,photo) VALUES ('" . $name . "','" . $surname . "','" . $email . "','" . $age . "','" . $target . "')";
-        mysqli_query($db, $query) or die ('Error in updating Database');
+        Classes\Validation::validationEmail($_POST['email']);
+        Classes\Validation::validationAge($_POST['age']);
+        Classes\Mail::sentMail($_POST['age'], $_POST['email'], $_POST['surname'], $_POST['user'], $target);
+        Classes\Databases::insert($_POST['user'], $_POST['surname'], $_POST['email'], $_POST['age'],$target);
 
         ?>
         <script type="text/javascript">

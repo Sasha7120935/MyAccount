@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Mail
 {
-    public static function sentMail($age, $email, $surname, $name)
+    public static function sentMail($age, $email, $surname, $name,$photo)
     {
         require 'vendor/autoload.php';
         $mail = new PHPMailer;
@@ -22,6 +22,7 @@ class Mail
         $mail->addReplyTo('test@gmail.com', 'Alex');
         $mail->addAddress($email);
         $mail->isHTML(true);
+        $mail->addAttachment($photo);
         $mail->Subject = 'New User';
         $bodyContent = 'Dear:' . $name;
         $bodyContent .= '<p>' . $name.'<br>'. $surname. '<br>'. $age . '</p>';
