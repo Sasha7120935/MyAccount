@@ -1,7 +1,4 @@
 <?php
-
-use Imagecow\Image;
-
 spl_autoload_register();
 ?>
     <!DOCTYPE html>
